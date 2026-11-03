@@ -150,10 +150,9 @@ with st.sidebar:
         try:
             new_df = pd.read_csv(uploaded)
             st.session_state.df = new_df
-            st.session_state.filename = uploaded.name
             st.session_state.models = {}
             st.session_state.best_pipeline = None
-            st.success(f"Loaded {uploaded.name}")
+           
         except Exception as exc:
             st.error(f"Could not read that CSV: {exc}")
     if st.session_state.df is not None:
