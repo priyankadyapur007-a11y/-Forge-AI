@@ -146,15 +146,28 @@ with st.sidebar:
     )
     st.divider()
     uploaded = st.file_uploader("Load a CSV dataset", type=["csv"], help="Your file is processed in this app session.")
-    if uploaded is not None:
-        try:
-            new_df = pd.read_csv(uploaded)
-            st.session_state.df = new_df
-            st.session_state.models = {}
-            st.session_state.best_pipeline = None
-           
-        except Exception as exc:
-            st.error(f"Could not read that CSV: {exc}")
+  if uploaded is not None and uploaded.name != st.session_state.filename:
+    try:
+        uploaded.seek(0)
+        new_df = pd.read_csv(uploaded)
+
+        st.session_state.df = new_df
+        st.session_state.filename = uploaded.name
+
+        # Reset old experiment results only for a new dataset
+        st.session_state.models = {}
+        st.session_state.best_name = None
+        st.session_state.best_pipeline = None
+        st.session_state.X_test = None
+        st.session_state.y_test = None
+        st.session_state.predictions = None
+        st.session_state.target = None
+        st.session_state.run_at = None
+
+        st.success(f"Loaded {uploaded.name}")
+
+    except Exception as exc:
+        st.error(f"Could not read that CSV: {exc}")
     if st.session_state.df is not None:
         st.markdown("**ACTIVE DATASET**")
         st.write(f"`{st.session_state.filename}`")
