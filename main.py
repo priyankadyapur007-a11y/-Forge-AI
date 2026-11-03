@@ -139,43 +139,52 @@ with st.sidebar:
     st.markdown('<div class="eyebrow">✦ FORGE / LAB 01</div>', unsafe_allow_html=True)
     st.markdown("## Your data, decoded.")
     st.caption("A compact workspace for exploring data and testing machine-learning ideas.")
+
     page = st.radio(
         "WORKSPACE",
         ["Mission Control", "Data Explorer", "Visual Studio", "Model Forge", "Model Report"],
         label_visibility="visible",
     )
+
     st.divider()
-    uploaded = st.file_uploader("Load a CSV dataset", type=["csv"], help="Your file is processed in this app session.")
-  if uploaded is not None and uploaded.name != st.session_state.filename:
-    try:
-        uploaded.seek(0)
-        new_df = pd.read_csv(uploaded)
+    uploaded = st.file_uploader(
+        "Load a CSV dataset",
+        type=["csv"],
+        help="Your file is processed in this app session."
+    )
 
-        st.session_state.df = new_df
-        st.session_state.filename = uploaded.name
+    if uploaded is not None and uploaded.name != st.session_state.filename:
+        try:
+            uploaded.seek(0)
+            new_df = pd.read_csv(uploaded)
 
-        # Reset old experiment results only for a new dataset
-        st.session_state.models = {}
-        st.session_state.best_name = None
-        st.session_state.best_pipeline = None
-        st.session_state.X_test = None
-        st.session_state.y_test = None
-        st.session_state.predictions = None
-        st.session_state.target = None
-        st.session_state.run_at = None
+            st.session_state.df = new_df
+            st.session_state.filename = uploaded.name
 
-        st.success(f"Loaded {uploaded.name}")
+            st.session_state.models = {}
+            st.session_state.best_name = None
+            st.session_state.best_pipeline = None
+            st.session_state.X_test = None
+            st.session_state.y_test = None
+            st.session_state.predictions = None
+            st.session_state.target = None
+            st.session_state.run_at = None
 
-    except Exception as exc:
-        st.error(f"Could not read that CSV: {exc}")
+            st.success(f"Loaded {uploaded.name}")
+
+        except Exception as exc:
+            st.error(f"Could not read that CSV: {exc}")
+
     if st.session_state.df is not None:
         st.markdown("**ACTIVE DATASET**")
         st.write(f"`{st.session_state.filename}`")
         st.caption(f"{len(st.session_state.df):,} rows · {st.session_state.df.shape[1]} columns")
+
         if st.button("Clear dataset", use_container_width=True):
-            for k in ["df","filename","target","models","best_name","best_pipeline","X_test","y_test","predictions"]:
-                st.session_state[k] = None if k not in ["models"] else {}
+            for k in ["df", "filename", "target", "models", "best_name", "best_pipeline", "X_test", "y_test", "predictions"]:
+                st.session_state[k] = None if k != "models" else {}
             st.rerun()
+
     st.divider()
     st.markdown('<div class="small-note">BUILT FOR CURIOUS MINDS · VERSION 1.0</div>', unsafe_allow_html=True)
 
